@@ -1,0 +1,19 @@
+{
+  "n_samples": 2473,
+  "facility_accuracy": 0.4699,
+  "facility_macro_f1": 0.3887,
+  "facility_weighted_f1": 0.4423,
+  "usage_day_accuracy": 0.6636,
+  "usage_day_macro_f1": 0.6571,
+  "usage_hour_exact_accuracy": 0.2353,
+  "usage_hour_within_1hr_accuracy": 0.5204,
+  "usage_hour_mae": 2.86,
+  "usage_hour_circular_mae": 2.78,
+  "lead_time_mae_hours": 12.15,
+  "nudge_window_accuracy": 0.3522,
+  "nudge_proactive_actionability_rate": 0.3235,
+  "exact_4_of_4_match_rate": 0.0546,
+  "partial_3_plus_match_rate": 0.262,
+  "partial_2_plus_match_rate": 0.5629,
+  "average_outputs_matched": 1.72
+}
