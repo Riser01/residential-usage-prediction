@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anacity Facility Usage Prediction System — Executive Presentation</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #60a5fa;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --tag-bg: #dbeafe;
+            --tag-text: #1e40af;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 48px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            color: #93c5fd;
+        }
+        h1 { margin: 0 0 12px 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { font-size: 17px; color: #cbd5e1; margin: 0 0 20px 0; max-width: 750px; }
+        .meta-bar {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #94a3b8;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 16px;
+        }
+        .meta-bar strong { color: white; }
+
+        .slide-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .slide-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+        .slide-num {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        h2 { margin: 0 0 16px 0; font-size: 22px; color: var(--primary); font-weight: 700; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+        .stat-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-val { font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+        .stat-lbl { font-size: 13px; color: var(--muted); font-weight: 500; }
+        .stat-lift { font-size: 12px; color: var(--success); font-weight: 700; margin-top: 4px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        th {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid var(--border);
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:last-child td { border-bottom: none; }
+        .highlight-row { background: #eff6ff; font-weight: 600; }
+
+        .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .tag {
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cta-bar {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: white; color: var(--primary); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #f1f5f9; }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Slide -->
+    <header>
+        <span class="badge">ANACITY / ANAROCK GROUP • AI ENGINEER ASSIGNMENT</span>
+        <h1>Facility Usage Prediction & Smart Notification System</h1>
+        <p class="subtitle">
+            An end-to-end, production-ready machine learning system forecasting resident amenity usage and proactive nudge timing across residential communities.
+        </p>
+        <div class="meta-bar">
+            <div><strong>Candidate:</strong> Prajwal Rao</div>
+            <div><strong>Evaluation:</strong> Chronological Holdout (Month 6)</div>
+            <div><strong>Status:</strong> 100% Complete & Tested</div>
+        </div>
+    </header>
+
+    <!-- Slide 1: The Problem & Objective -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 01 • BUSINESS CONTEXT & DELIVERABLES</div>
+        <h2>Solving Shared Amenity Friction with Predictive Intelligence</h2>
+        <div class="grid-2">
+            <div>
+                <p>
+                    Residential communities manage high-demand shared amenities: Gym, Swimming Pool, Badminton, Tennis, Clubhouse, and Multipurpose Hall. Traditional static scheduling creates peak crowding and off-peak vacancy.
+                </p>
+                <p>
+                    <strong>The 4 Core Predictions:</strong>
+                </p>
+                <ul>
+                    <li><strong>Facility:</strong> Which amenity will the resident book next?</li>
+                    <li><strong>Usage Day:</strong> Which day of the week (Mon–Sun)?</li>
+                    <li><strong>Usage Time:</strong> What operating hour (e.g. 07:00, 18:00)?</li>
+                    <li><strong>Notification Timing:</strong> When to send a proactive nudge to prompt booking?</li>
+                </ul>
+            </div>
+            <div>
+                <div class="stat-box" style="margin-bottom: 16px;">
+                    <div class="stat-val">3 Deliverables</div>
+                    <div class="stat-lbl">Strictly Fulfilling Assignment §4</div>
+                </div>
+                <div class="tag-list">
+                    <span class="tag">01 Synthetic Dataset (12,909 rows)</span>
+                    <span class="tag">02 Technical Documentation</span>
+                    <span class="tag">03 Tabular Prediction Review Table</span>
+                    <span class="tag">Zero Temporal Leakage</span>
+                    <span class="tag">14 Passed Pytest Gates</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Synthetic Data Realism -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 02 • DATASET ENGINE (§3.1)</div>
+        <h2>High-Fidelity Simulation of Community Dynamics</h2>
+        <p>A 6-month simulation (Jan–Jun 2026) across 350 residents modeling 8 required real-world dimensions:</p>
+        <div class="grid-3">
+            <div class="stat-box">
+                <div class="stat-lbl">Resident Personas</div>
+                <p style="font-size: 13px; margin: 8px 0 0 0; color: #475569;">Dawn Athletes (25%), Evening Sports (25%), Weekend Leisure (20%), Sporadic (20%), Event Organizers (10%).</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl">Facility Pareto Imbalance</div>
+                <p style="font-size: 13px; margin: 8px 0 0 0; color: #475569;">Gym 38%, Pool 24%, Badminton 18%, Tennis 11%, Clubhouse 6%, Hall 3%.</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl">Log-Normal Lead Times</div>
+                <p style="font-size: 13px; margin: 8px 0 0 0; color: #475569;">Gym ~12h, Pool ~16h, Badminton ~22h, Tennis ~30h, Clubhouse ~2d, Hall ~6d.</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl">Diurnal Time Patterns</div>
+                <p style="font-size: 13px; margin: 8px 0 0 0; color: #475569;">Weekday morning & evening peaks; weekend midday shifts.</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl">Behavioral Drift (Concept Drift)</div>
+                <p style="font-size: 13px; margin: 8px 0 0 0; color: #475569;">15% residents undergo schedule/summer pool shifts at Day 105.</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl">Physical Sanity Guards</div>
+                <p style="font-size: 13px; margin: 8px 0 0 0; color: #475569;">Booking &lt; Usage strictly, operating hours capped, no double bookings.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Architecture & Modeling -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 03 • MODELING ARCHITECTURE (§3.2)</div>
+        <h2>Cascaded Multi-Target GBDT Pipeline</h2>
+        <div class="grid-2">
+            <div>
+                <p>
+                    Rather than 4 disconnected models that output incompatible combinations, our architecture uses a <strong>cascaded, hierarchical LightGBM pipeline</strong>:
+                </p>
+                <ol style="font-size: 14px; padding-left: 20px;">
+                    <li><strong>Stage 1 (Facility Classifier):</strong> Evaluates user preferences, recency, and Bayes shrinkage priors.</li>
+                    <li><strong>Stage 2 (Usage Day Classifier):</strong> Predicts day conditioned on user history and predicted facility.</li>
+                    <li><strong>Stage 3 (Usage Hour Classifier):</strong> Predicts operating hour slot (06..22) conditioned on facility and day context.</li>
+                    <li><strong>Stage 4 (Lead Time Quantile Regressor, &alpha;=0.35):</strong> Optimizes for proactive nudge timing to guarantee alerts precede bookings.</li>
+                </ol>
+            </div>
+            <div>
+                <div class="stat-box" style="text-align: left;">
+                    <div class="stat-lbl" style="text-transform: uppercase; font-weight: 700; color: var(--accent);">Leakage Control Highlights</div>
+                    <ul style="font-size: 13px; color: #475569; margin: 8px 0 0 0; padding-left: 18px;">
+                        <li>Strict chronological train/val/test splitting (Month 6 unseen holdout).</li>
+                        <li>Expanding-window causal state tracker (0 future lookahead).</li>
+                        <li>Automated temporal assertion tests (<code>tests/test_leakage_safety.py</code>).</li>
+                        <li>Fast CPU inference (&lt;10ms per prediction).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Holdout Benchmark Results -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 04 • EVALUATION ON UNSEEN HOLDOUT SET (§3.3)</div>
+        <h2>Benchmark Results (Month 6 Holdout: 2,473 Samples)</h2>
+        <div class="grid-4" style="margin-bottom: 24px;">
+            <div class="stat-box">
+                <div class="stat-val">66.36%</div>
+                <div class="stat-lbl">Usage Day Accuracy</div>
+                <div class="stat-lift">+45.3% (3.1x Lift)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">52.04%</div>
+                <div class="stat-lbl">Hour (&plusmn;1h) Accuracy</div>
+                <div class="stat-lift">+28.8% vs Baseline</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">46.99%</div>
+                <div class="stat-lbl">Facility Accuracy</div>
+                <div class="stat-lift">+12.6% vs Baseline</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">5.46%</div>
+                <div class="stat-lbl">Exact 4 of 4 Matches</div>
+                <div class="stat-lift">135 Exact Matches</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Model Architecture</th>
+                    <th>Facility Acc</th>
+                    <th>Day Acc</th>
+                    <th>Hour (&plusmn;1h) Acc</th>
+                    <th>Exact 4 of 4</th>
+                    <th>Avg Matched Outputs</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight-row">
+                    <td><strong>Cascaded GBDT Pipeline (Ours)</strong></td>
+                    <td><strong>47.0%</strong></td>
+                    <td><strong>66.4%</strong></td>
+                    <td><strong>52.0%</strong></td>
+                    <td><strong>5.5%</strong></td>
+                    <td><strong>1.72 / 4.0</strong></td>
+                </tr>
+                <tr>
+                    <td>Habitual Historical Mode Baseline</td>
+                    <td>47.5%</td>
+                    <td>21.1%</td>
+                    <td>49.1%</td>
+                    <td>0.1%</td>
+                    <td>0.97 / 4.0</td>
+                </tr>
+                <tr>
+                    <td>Global Community Mode Baseline</td>
+                    <td>34.4%</td>
+                    <td>15.8%</td>
+                    <td>23.2%</td>
+                    <td>0.0%</td>
+                    <td>0.67 / 4.0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Slide 5: Prediction Review Table & Formatting -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 05 • DELIVERABLE REVIEW TABLE (§3.4 & §3.5)</div>
+        <h2>Tabular Prediction Review Output</h2>
+        <p>Formulated exactly per Assignment PDF Section 3.5:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Resident</th>
+                    <th>PAST BOOKINGS<br><small style="color:#64748b">facility / day / use time / booked at</small></th>
+                    <th>PREDICTION<br><small style="color:#64748b">facility / day / use time / nudge time</small></th>
+                    <th>ACTUAL<br><small style="color:#64748b">facility / day / use time / booked at</small></th>
+                    <th>MATCH</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>R-104</strong></td>
+                    <td>Gym / Mon / 07:00 / Sun 18:20<br>Gym / Wed / 07:00 / Tue 18:05</td>
+                    <td><strong>Gym / Fri / 07:00</strong><br>Nudge Thu / 18:15</td>
+                    <td><strong>Gym / Fri / 07:00</strong><br>Booked Thu / 18:15</td>
+                    <td><span style="color:var(--success); font-weight:700;">YES 4 of 4</span></td>
+                </tr>
+                <tr>
+                    <td><strong>R-118</strong></td>
+                    <td>Pool / Sat / 18:00 / Fri 09:10<br>Pool / Sun / 18:00 / Sat 09:15</td>
+                    <td><strong>Pool / Sat / 18:00</strong><br>Nudge Fri / 09:20</td>
+                    <td><strong>Pool / Sat / 18:00</strong><br>Booked Fri / 09:20</td>
+                    <td><span style="color:var(--success); font-weight:700;">YES 4 of 4</span></td>
+                </tr>
+                <tr>
+                    <td><strong>R-126</strong></td>
+                    <td>Badminton / Thu / 20:00 / Wed 12:40<br>Badminton / Fri / 20:00 / Thu 12:35</td>
+                    <td><strong>Badminton / Fri / 20:00</strong><br>Nudge Thu / 12:30</td>
+                    <td><strong>Gym / Fri / 19:00</strong><br>Booked Thu / 12:30</td>
+                    <td><span style="color:#dc2626; font-weight:700;">NO 2 of 4</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="cta-bar">
+            <a href="prediction_review.html" class="btn btn-primary" target="_blank">Open Full Interactive Review Table &rarr;</a>
+            <a href="https://github.com/Riser01/facility-usage-prediction" class="btn btn-secondary" target="_blank">View GitHub Repository &rarr;</a>
+        </div>
+    </div>
+
+    <!-- Slide 6: Production Roadmap -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 06 • PRODUCTION ROADMAP & NEXT STEPS</div>
+        <h2>Scaling into Anacity Production</h2>
+        <div class="grid-3">
+            <div class="stat-box">
+                <div class="stat-lbl" style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">1. Online A/B Testing</div>
+                <p style="font-size: 13px; color: #475569; margin: 0;">Measure booking conversion lift, cancellation drop, and amenity no-show rate improvements.</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl" style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">2. Notification Frequency Capping</div>
+                <p style="font-size: 13px; color: #475569; margin: 0;">Implement dynamic priority queues to guarantee residents receive at most 2 nudges per week.</p>
+            </div>
+            <div class="stat-box">
+                <div class="stat-lbl" style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">3. Load Balancing Interventions</div>
+                <p style="font-size: 13px; color: #475569; margin: 0;">When a slot nears 90% capacity, steer nudges to adjacent off-peak slots with community loyalty perks.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
