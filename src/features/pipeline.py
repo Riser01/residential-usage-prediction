@@ -82,7 +82,7 @@ class FeatureExtractor:
             hist = user_history[rid]
             n_hist = len(hist)
 
-            # 1. User activity volume & Cutoff context
+            # 1. User activity volume, Cutoff context & Circular Temporal Encodings
             cut_dow = b_dt.weekday()
             cut_hour = b_dt.hour
             cut_month = b_dt.month
@@ -93,18 +93,42 @@ class FeatureExtractor:
                 "cut_dow": cut_dow,
                 "cut_hour": cut_hour,
                 "cut_month": cut_month,
+                "cut_hour_sin": math.sin(2 * math.pi * cut_hour / 24.0),
+                "cut_hour_cos": math.cos(2 * math.pi * cut_hour / 24.0),
+                "cut_dow_sin": math.sin(2 * math.pi * cut_dow / 7.0),
+                "cut_dow_cos": math.cos(2 * math.pi * cut_dow / 7.0),
                 "is_cut_weekend": 1 if cut_dow in [5, 6] else 0,
             }
 
-            # 2. Sequential & Recency features
+            # 2. Sequential & Recency features with Strict Causal Usage Auditing
             if n_hist > 0:
                 last_event = hist[-1]
-                feat["days_since_last_booking"] = (b_dt - last_event["booking_dt"]).total_seconds() / 86400.0
-                feat["days_since_last_usage"] = (b_dt - last_event["usage_dt"]).total_seconds() / 86400.0
+                feat["days_since_last_booking"] = max(0.0, (b_dt - last_event["booking_dt"]).total_seconds() / 86400.0)
                 feat["last_facility"] = last_event["facility"]
-                feat["last_usage_dow"] = last_event["usage_dt"].weekday()
-                feat["last_usage_hour"] = last_event["usage_dt"].hour
                 feat["last_lead_time_hours"] = last_event["lead_time_hours"]
+
+                # Audit completed usages (usage <= b_dt) vs pending future reservations (usage > b_dt)
+                completed_usages = [h for h in hist if h["usage_dt"] <= b_dt]
+                pending_reservations = [h for h in hist if h["usage_dt"] > b_dt]
+
+                feat["active_future_reservations_count"] = len(pending_reservations)
+
+                if completed_usages:
+                    last_completed = completed_usages[-1]
+                    feat["days_since_last_usage"] = (b_dt - last_completed["usage_dt"]).total_seconds() / 86400.0
+                    feat["last_usage_dow"] = last_completed["usage_dt"].weekday()
+                    feat["last_usage_hour"] = last_completed["usage_dt"].hour
+                else:
+                    feat["days_since_last_usage"] = 30.0
+                    feat["last_usage_dow"] = cut_dow
+                    feat["last_usage_hour"] = 18
+
+                if pending_reservations:
+                    # Days until earliest pending usage
+                    earliest_pending = min(h["usage_dt"] for h in pending_reservations)
+                    feat["days_until_next_reserved_usage"] = (earliest_pending - b_dt).total_seconds() / 86400.0
+                else:
+                    feat["days_until_next_reserved_usage"] = 99.0
             else:
                 feat["days_since_last_booking"] = 30.0
                 feat["days_since_last_usage"] = 30.0
@@ -112,25 +136,40 @@ class FeatureExtractor:
                 feat["last_usage_dow"] = cut_dow
                 feat["last_usage_hour"] = 18
                 feat["last_lead_time_hours"] = 24.0
+                feat["active_future_reservations_count"] = 0
+                feat["days_until_next_reserved_usage"] = 99.0
 
-            # 3. User Facility Preference with Empirical Bayes Shrinkage
-            fac_counts = {f: 0 for f in FACILITY_LIST}
-            dow_counts = {d: 0 for d in range(7)}
+            # 3. Recency-Weighted Facility & Day Preference with Exponential Decay
+            decay_lambda = 0.025  # ~28-day half life for habit drift
+            fac_counts = {f: 0.0 for f in FACILITY_LIST}
+            dow_counts = {d: 0.0 for d in range(7)}
+            fac_dow_counts = {f: {d: 0.0 for d in range(7)} for f in FACILITY_LIST}
             hour_counts = []
             lead_times = []
+            total_decay_weight = 0.0
 
             for h in hist:
-                fac_counts[h["facility"]] = fac_counts.get(h["facility"], 0) + 1
-                dow_counts[h["usage_dt"].weekday()] += 1
-                hour_counts.append(h["usage_dt"].hour)
+                dt_days = max(0.0, (b_dt - h["booking_dt"]).total_seconds() / 86400.0)
+                w = math.exp(-decay_lambda * dt_days)
+                total_decay_weight += w
+
+                f_name = h["facility"]
+                u_dow = h["usage_dt"].weekday()
+                u_hr = h["usage_dt"].hour
+
+                fac_counts[f_name] += w
+                dow_counts[u_dow] += w
+                fac_dow_counts[f_name][u_dow] += w
+                hour_counts.append(u_hr)
                 lead_times.append(h["lead_time_hours"])
 
+            effective_n = total_decay_weight
             entropy = 0.0
             top_fac = "None"
-            max_c = -1
+            max_c = -1.0
             for f in FACILITY_LIST:
                 c = fac_counts[f]
-                smoothed_ratio = (c + M * priors.get(f, 0.16)) / (n_hist + M)
+                smoothed_ratio = (c + M * priors.get(f, 0.16)) / (effective_n + M)
                 feat[f"user_fac_ratio_{f}"] = smoothed_ratio
                 entropy -= smoothed_ratio * math.log(smoothed_ratio + 1e-9)
                 if c > max_c:
@@ -140,27 +179,45 @@ class FeatureExtractor:
             feat["user_facility_entropy"] = entropy
             feat["user_top_facility"] = top_fac if n_hist > 0 else "Gym"
 
-            # 4. Day-of-week distribution
+            # 4. Day-of-week distribution (Recency-Weighted)
             top_dow = 0
-            max_d_c = -1
+            max_d_c = -1.0
             for d in range(7):
-                dow_ratio = (dow_counts[d] + 1.0) / (n_hist + 7.0)
+                dow_ratio = (dow_counts[d] + 1.0) / (effective_n + 7.0)
                 feat[f"user_dow_ratio_{d}"] = dow_ratio
                 if dow_counts[d] > max_d_c:
                     max_d_c = dow_counts[d]
                     top_dow = d
             feat["user_top_dow"] = top_dow if n_hist > 0 else cut_dow
 
-            # 5. Usage hour distributions
+            # 5. Facility x Day-of-Week Interaction Affinity for Top Facility
+            if top_fac in fac_dow_counts:
+                top_fac_dow_sum = sum(fac_dow_counts[top_fac].values())
+                for d in range(7):
+                    feat[f"user_topfac_dow_affinity_{d}"] = (
+                        (fac_dow_counts[top_fac][d] + 0.5) / (top_fac_dow_sum + 3.5)
+                    )
+            else:
+                for d in range(7):
+                    feat[f"user_topfac_dow_affinity_{d}"] = 1.0 / 7.0
+
+            # 6. Usage hour distributions & Circular Hour Mean
             if n_hist > 0:
                 feat["user_mean_hour"] = float(np.mean(hour_counts))
+                sin_hrs = [math.sin(2 * math.pi * h / 24.0) for h in hour_counts]
+                cos_hrs = [math.cos(2 * math.pi * h / 24.0) for h in hour_counts]
+                feat["user_circ_hour_sin"] = float(np.mean(sin_hrs))
+                feat["user_circ_hour_cos"] = float(np.mean(cos_hrs))
+
                 morning = sum(1 for h in hour_counts if h < 12) / n_hist
                 afternoon = sum(1 for h in hour_counts if 12 <= h < 17) / n_hist
                 evening = sum(1 for h in hour_counts if h >= 17) / n_hist
-                weekend = (dow_counts[5] + dow_counts[6]) / n_hist
+                weekend = (dow_counts[5] + dow_counts[6]) / max(0.01, effective_n)
                 feat["user_median_lead_hours"] = float(np.median(lead_times))
             else:
                 feat["user_mean_hour"] = 12.0
+                feat["user_circ_hour_sin"] = 0.0
+                feat["user_circ_hour_cos"] = -1.0
                 morning = 0.33
                 afternoon = 0.33
                 evening = 0.34

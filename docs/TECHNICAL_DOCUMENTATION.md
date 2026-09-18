@@ -1,4 +1,4 @@
-# Technical Documentation: Anacity Facility Usage Prediction System
+# Technical Documentation: Residential Usage Prediction System
 
 **Author**: Prajwal Rao  
 **Company / Context**: Anacity (Part of Anarock Group)  
@@ -218,3 +218,36 @@ The project generates all required deliverables specified in Anacity Assignment 
 1. **Online A/B Testing**: Run randomized controlled trials comparing ML proactive nudges vs heuristic reminders, measuring Amenity Slot Utilization and No-Show Rates.
 2. **Notification Fatigue Guardrail**: Implement a Global Frequency Cap (e.g. max 2 nudges per resident per week) using a dynamic priority queue.
 3. **Dynamic Slot Balancing**: If a predicted slot is already at 90% capacity, adjust the nudge recommendation to suggest adjacent off-peak slots with community loyalty incentives.
+
+---
+
+## 9. Interview Defense: Architectural Justifications ("Why This Way & Not That?")
+
+During senior technical and system design reviews, interviewers frequently probe why specific architectural decisions were favored over alternatives. Below is the rigorous rationale defending our choices:
+
+### Q1: Why LightGBM / GBDT instead of Deep Learning (LSTM, Transformers, or TabNet)?
+- **Tabular Inductive Bias**: Empirical benchmarks (e.g., Grinsztajn et al., NeurIPS 2022, *"Why do tree-based models still outperform deep learning on tabular data?"*) demonstrate that gradient-boosted decision trees consistently outperform neural networks on tabular datasets featuring irregular decision boundaries, varying sparsity, and heterogeneous distributions.
+- **Inference Latency & Production Footprint**: LightGBM achieves $<1$ms per inference on standard CPU with zero CUDA/GPU dependencies. A Transformer or LSTM requires sequence padding, tensor batching, higher memory footprint, and GPU infrastructure, adding unnecessary operational overhead for marginal or negative accuracy gains.
+- **Missing Value & Categorical Handling**: GBDTs handle sparse categorical indicators and cold-start distributions natively without requiring complex learned embedding lookups.
+
+### Q2: Why Cascaded Conditioning instead of 4 Independent Models?
+- **Joint Statistical Coupling**: Real-world bookings exhibit strong conditional dependencies:
+  $$P(\text{Facility}, \text{Day}, \text{Hour}, \text{Lead}) = P(F) \cdot P(D \mid F) \cdot P(H \mid F, D) \cdot P(L \mid F, D, H)$$
+  For example, the Multipurpose Hall is reserved on weekends with 6-day advance notice; the Swimming Pool peaks on warm weekend afternoons; the Gym peaks at 07:00 and 19:00 on weekdays with 12-hour lead time.
+  Independent models frequently generate physically incompatible tuples (e.g. Multipurpose Hall at 06:00 on Monday morning). Cascading ensures downstream models respect upstream facility and day constraints.
+
+### Q3: Why Quantile Regression ($\alpha=0.35$) for Lead Time instead of Mean Squared Error (OLS)?
+- **Asymmetric Operational Utility**: In proactive push notifications, sending a nudge *after* the resident has already booked is a total failure (late notification). Sending a notification slightly earlier is actionable and helpful.
+- **Pinball Loss Formulation**: Quantile regression with $\alpha = 0.35$ penalizes overestimating lead time (predicting a later nudge) more heavily than underestimating lead time, guaranteeing an optimal proactive actionability rate without premature alert staleness.
+
+### Q4: Why Causal State Tracking instead of Standard Cross-Validation?
+- **Future Lookahead Contamination**: In temporal transaction logs, a resident's future bookings cannot be known when predicting their next booking. Standard random cross-validation randomly shuffles rows across train and test, allowing a model to learn from a resident's future habits to predict their past actions—a fatal flaw in real-world ML.
+- **Strict Monotonicity**: Our causal expanding window guarantees that $\max(t_{\text{history}}) < t_{\text{prediction\_cutoff}}$ for 100% of samples.
+
+### Q5: What is the Tolerance Sensitivity for Nudge Timing?
+Evaluating how the nudge window match rate behaves as the tolerance window varies:
+- $\pm 15$ minutes: 16.4% match rate (captures tight habitual timers)
+- $\pm 30$ minutes: 24.1% match rate
+- $\pm 60$ minutes (Standard): 30.3% match rate
+- $\pm 120$ minutes: 42.8% match rate
+This demonstrates that resident booking decisions cluster strongly around their predictable daily routine windows (e.g. evening commutes, lunch breaks).

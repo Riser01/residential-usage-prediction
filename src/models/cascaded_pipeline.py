@@ -35,48 +35,51 @@ class CascadedPredictionPipeline:
         self.day_classes = list(range(7))  # 0 = Mon, ..., 6 = Sun
         self.hour_classes = list(range(6, 24))  # 6..23 operating hours
 
-        # Stage 1: Facility Classifier
+        # Stage 1: Facility Classifier (Regularized for multi-class generalization)
         self.facility_model = lgb.LGBMClassifier(
-            n_estimators=100,
-            learning_rate=0.08,
-            num_leaves=31,
+            n_estimators=120,
+            learning_rate=0.06,
+            num_leaves=25,
+            min_child_samples=25,
             subsample=0.85,
-            colsample_bytree=0.85,
+            colsample_bytree=0.80,
             random_state=random_state,
             verbosity=-1,
         )
 
-        # Stage 2: Usage Day Classifier
+        # Stage 2: Usage Day Classifier (Conditioned on facility context)
         self.day_model = lgb.LGBMClassifier(
-            n_estimators=100,
-            learning_rate=0.08,
-            num_leaves=31,
+            n_estimators=120,
+            learning_rate=0.06,
+            num_leaves=25,
+            min_child_samples=25,
             subsample=0.85,
-            colsample_bytree=0.85,
+            colsample_bytree=0.80,
             random_state=random_state,
             verbosity=-1,
         )
 
-        # Stage 3: Usage Hour Classifier
+        # Stage 3: Usage Hour Classifier (Conditioned on facility & day context)
         self.hour_model = lgb.LGBMClassifier(
             n_estimators=100,
-            learning_rate=0.08,
+            learning_rate=0.07,
             num_leaves=31,
+            min_child_samples=20,
             subsample=0.85,
             colsample_bytree=0.85,
             random_state=random_state,
             verbosity=-1,
         )
 
-        # Stage 4: Lead Time Regressor (Quantile alpha=0.35 to guarantee proactive nudge)
+        # Stage 4: Lead Time Regressor (Quantile alpha=0.30 to guarantee proactive nudge)
         self.lead_time_model = lgb.LGBMRegressor(
             objective="quantile",
-            alpha=0.35,
+            alpha=0.30,
             n_estimators=100,
-            learning_rate=0.06,
-            num_leaves=31,
+            learning_rate=0.05,
+            num_leaves=25,
             subsample=0.85,
-            colsample_bytree=0.85,
+            colsample_bytree=0.80,
             random_state=random_state,
             verbosity=-1,
         )

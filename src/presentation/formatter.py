@@ -128,7 +128,7 @@ class PredictionFormatter:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anacity Facility Usage Prediction — Review Output</title>
+    <title>Residential Usage Prediction System — Review Output</title>
     <style>
         :root {{
             --primary: #1e3a8a;
@@ -264,7 +264,7 @@ class PredictionFormatter:
 <body>
 
     <div class="header">
-        <h1>Anacity Facility Usage Prediction System</h1>
+        <h1>Residential Usage Prediction System</h1>
         <p>Prediction Review Table conforming to Assignment §3.4 & §3.5 | Chronological Unseen Holdout Evaluation</p>
     </div>
 

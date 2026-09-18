@@ -1,4 +1,4 @@
-"""Unified Command-Line Interface for the Anacity Facility Usage Prediction System."""
+"""Unified Command-Line Interface for the Residential Usage Prediction System."""
 
 import argparse
 import json
@@ -27,7 +27,7 @@ def run_pipeline(
     """Executes the complete end-to-end workflow."""
     start_time = time.time()
     print("================================================================================")
-    print("🏢 ANACITY FACILITY USAGE PREDICTION SYSTEM — END-TO-END PIPELINE")
+    print("🏢 RESIDENTIAL USAGE PREDICTION SYSTEM — END-TO-END PIPELINE")
     print(f"Mode: {mode.upper()} | Python: {sys.version.split()[0]} | Seed: {seed}")
     print("================================================================================")
 
@@ -177,7 +177,7 @@ def run_pipeline(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Anacity Facility Usage Prediction System")
+    parser = argparse.ArgumentParser(description="Residential Usage Prediction System")
     parser.add_argument(
         "--mode",
         type=str,

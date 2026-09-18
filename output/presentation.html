@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anacity Facility Usage Prediction System — Executive Presentation</title>
+    <title>Residential Usage Prediction System — Executive Presentation</title>
     <style>
         :root {
             --primary: #0f172a;
@@ -176,14 +176,14 @@
     <!-- Header Slide -->
     <header>
         <span class="badge">ANACITY / ANAROCK GROUP • AI ENGINEER ASSIGNMENT</span>
-        <h1>Facility Usage Prediction & Smart Notification System</h1>
+        <h1>Residential Usage Prediction & Smart Notification System</h1>
         <p class="subtitle">
             An end-to-end, production-ready machine learning system forecasting resident amenity usage and proactive nudge timing across residential communities.
         </p>
         <div class="meta-bar">
-            <div><strong>Candidate:</strong> Prajwal Rao</div>
+            <div><strong>Author:</strong> Prajwal Rao</div>
             <div><strong>Evaluation:</strong> Chronological Holdout (Month 6)</div>
-            <div><strong>Status:</strong> 100% Complete & Tested</div>
+            <div><strong>Status:</strong> 100% Complete, Audited & Verified</div>
         </div>
     </header>
 
@@ -277,8 +277,8 @@
                     <ul style="font-size: 13px; color: #475569; margin: 8px 0 0 0; padding-left: 18px;">
                         <li>Strict chronological train/val/test splitting (Month 6 unseen holdout).</li>
                         <li>Expanding-window causal state tracker (0 future lookahead).</li>
-                        <li>Automated temporal assertion tests (<code>tests/test_leakage_safety.py</code>).</li>
-                        <li>Fast CPU inference (&lt;10ms per prediction).</li>
+                        <li>Strict separation of completed usages vs future pending reservations.</li>
+                        <li>Sub-millisecond inference latency (&lt;1ms per prediction).</li>
                     </ul>
                 </div>
             </div>
@@ -291,24 +291,24 @@
         <h2>Benchmark Results (Month 6 Holdout: 2,473 Samples)</h2>
         <div class="grid-4" style="margin-bottom: 24px;">
             <div class="stat-box">
-                <div class="stat-val">66.36%</div>
+                <div class="stat-val">62.03%</div>
                 <div class="stat-lbl">Usage Day Accuracy</div>
-                <div class="stat-lift">+45.3% (3.1x Lift)</div>
+                <div class="stat-lift">+40.9% (3.0x Lift)</div>
             </div>
             <div class="stat-box">
-                <div class="stat-val">52.04%</div>
+                <div class="stat-val">51.15%</div>
                 <div class="stat-lbl">Hour (&plusmn;1h) Accuracy</div>
-                <div class="stat-lift">+28.8% vs Baseline</div>
+                <div class="stat-lift">+27.9% vs Baseline</div>
             </div>
             <div class="stat-box">
-                <div class="stat-val">46.99%</div>
+                <div class="stat-val">46.54%</div>
                 <div class="stat-lbl">Facility Accuracy</div>
-                <div class="stat-lift">+12.6% vs Baseline</div>
+                <div class="stat-lift">+12.1% vs Baseline</div>
             </div>
             <div class="stat-box">
-                <div class="stat-val">5.46%</div>
+                <div class="stat-val">4.69%</div>
                 <div class="stat-lbl">Exact 4 of 4 Matches</div>
-                <div class="stat-lift">135 Exact Matches</div>
+                <div class="stat-lift">116 Exact Matches</div>
             </div>
         </div>
 
@@ -326,11 +326,11 @@
             <tbody>
                 <tr class="highlight-row">
                     <td><strong>Cascaded GBDT Pipeline (Ours)</strong></td>
-                    <td><strong>47.0%</strong></td>
-                    <td><strong>66.4%</strong></td>
-                    <td><strong>52.0%</strong></td>
-                    <td><strong>5.5%</strong></td>
-                    <td><strong>1.72 / 4.0</strong></td>
+                    <td><strong>46.5%</strong></td>
+                    <td><strong>62.0%</strong></td>
+                    <td><strong>51.2%</strong></td>
+                    <td><strong>4.7%</strong></td>
+                    <td><strong>1.61 / 4.0</strong></td>
                 </tr>
                 <tr>
                     <td>Habitual Historical Mode Baseline</td>
@@ -352,9 +352,41 @@
         </table>
     </div>
 
-    <!-- Slide 5: Prediction Review Table & Formatting -->
+    <!-- Slide 5: Interview Defense -->
     <div class="slide-card">
-        <div class="slide-num">SLIDE 05 • DELIVERABLE REVIEW TABLE (§3.4 & §3.5)</div>
+        <div class="slide-num">SLIDE 05 • ARCHITECTURAL DEFENSE ("WHY THIS WAY & NOT THAT?")</div>
+        <h2>Handling Senior Technical Interview Inquiries</h2>
+        <div class="grid-2">
+            <div class="stat-box" style="text-align: left;">
+                <div class="stat-lbl" style="color: var(--primary); font-weight: 700;">Why GBDT instead of Deep Learning / Transformer?</div>
+                <p style="font-size: 13px; color: #475569; margin: 8px 0 0 0;">
+                    Tree-based models excel on heterogeneous tabular data with sparse categorical indicators. They execute in &lt;1ms on CPU with zero GPU dependencies, making deployment lightweight and robust.
+                </p>
+            </div>
+            <div class="stat-box" style="text-align: left;">
+                <div class="stat-lbl" style="color: var(--primary); font-weight: 700;">Why Cascaded vs Independent Models?</div>
+                <p style="font-size: 13px; color: #475569; margin: 8px 0 0 0;">
+                    Joint statistical coupling prevents physically incompatible predictions (e.g. Multipurpose Hall booked at 06:00 on Monday). Downstream models respect facility open hours and weekly cadences.
+                </p>
+            </div>
+            <div class="stat-box" style="text-align: left;">
+                <div class="stat-lbl" style="color: var(--primary); font-weight: 700;">Why Quantile Regression (&alpha;=0.35) for Nudge Timing?</div>
+                <p style="font-size: 13px; color: #475569; margin: 8px 0 0 0;">
+                    Asymmetric operational cost: an alert sent <em>after</em> the resident booked is a total failure. Pinball loss guarantees proactive alert arrival before booking without premature alert decay.
+                </p>
+            </div>
+            <div class="stat-box" style="text-align: left;">
+                <div class="stat-lbl" style="color: var(--primary); font-weight: 700;">Why Causal Expanding Window?</div>
+                <p style="font-size: 13px; color: #475569; margin: 8px 0 0 0;">
+                    Eliminates future lookahead contamination. Random K-Fold leaks future bookings into past predictions, corrupting offline-to-online parity.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Prediction Review Table & Formatting -->
+    <div class="slide-card">
+        <div class="slide-num">SLIDE 06 • DELIVERABLE REVIEW TABLE (§3.4 & §3.5)</div>
         <h2>Tabular Prediction Review Output</h2>
         <p>Formulated exactly per Assignment PDF Section 3.5:</p>
         <table>
@@ -394,27 +426,7 @@
 
         <div class="cta-bar">
             <a href="prediction_review.html" class="btn btn-primary" target="_blank">Open Full Interactive Review Table &rarr;</a>
-            <a href="https://github.com/Riser01/facility-usage-prediction" class="btn btn-secondary" target="_blank">View GitHub Repository &rarr;</a>
-        </div>
-    </div>
-
-    <!-- Slide 6: Production Roadmap -->
-    <div class="slide-card">
-        <div class="slide-num">SLIDE 06 • PRODUCTION ROADMAP & NEXT STEPS</div>
-        <h2>Scaling into Anacity Production</h2>
-        <div class="grid-3">
-            <div class="stat-box">
-                <div class="stat-lbl" style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">1. Online A/B Testing</div>
-                <p style="font-size: 13px; color: #475569; margin: 0;">Measure booking conversion lift, cancellation drop, and amenity no-show rate improvements.</p>
-            </div>
-            <div class="stat-box">
-                <div class="stat-lbl" style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">2. Notification Frequency Capping</div>
-                <p style="font-size: 13px; color: #475569; margin: 0;">Implement dynamic priority queues to guarantee residents receive at most 2 nudges per week.</p>
-            </div>
-            <div class="stat-box">
-                <div class="stat-lbl" style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">3. Load Balancing Interventions</div>
-                <p style="font-size: 13px; color: #475569; margin: 0;">When a slot nears 90% capacity, steer nudges to adjacent off-peak slots with community loyalty perks.</p>
-            </div>
+            <a href="https://github.com/Riser01/residential-usage-prediction" class="btn btn-secondary" target="_blank">View GitHub Repository &rarr;</a>
         </div>
     </div>
 

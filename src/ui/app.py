@@ -1,4 +1,4 @@
-"""Interactive Streamlit Dashboard for Anacity Facility Usage Prediction System."""
+"""Interactive Streamlit Dashboard for Residential Usage Prediction System."""
 
 import os
 import json
@@ -6,12 +6,12 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="Anacity Facility Usage Prediction System",
+    page_title="Residential Usage Prediction System",
     page_icon="🏢",
     layout="wide",
 )
 
-st.title("🏢 Anacity Facility Usage Prediction System")
+st.title("🏢 Residential Usage Prediction System")
 st.markdown(
     "**Anacity (Part of Anarock Group) AI Engineer Assignment** — Intelligent facility booking and proactive nudge prediction."
 )

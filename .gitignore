@@ -32,3 +32,8 @@ htmlcov/
 # Scratch and temp
 scratch/
 *.tmp
+
+# Internal planning & reviewer records (kept local)
+ADVERSARIAL_REVIEWS.md
+DESIGN.md
+TRACKER.md
