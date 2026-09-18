@@ -92,6 +92,7 @@ Rather than treating the problem as four independent models, the system implemen
 | **02 Technical Documentation** | Full architectural explanation, feature design, leakage controls, model trade-offs, holdout benchmarking, error analysis & production roadmap | [`docs/TECHNICAL_DOCUMENTATION.md`](docs/TECHNICAL_DOCUMENTATION.md) |
 | **03 Prediction Review Output** | Prediction review table matching PDF §3.5 format (`PAST BOOKINGS` \| `PREDICTION` \| `ACTUAL` \| `MATCH`) across CSV, Excel, and interactive HTML | [`output/prediction_review_table.csv`](output/prediction_review_table.csv)<br>[`output/prediction_review_table.xlsx`](output/prediction_review_table.xlsx)<br>[`output/prediction_review.html`](output/prediction_review.html) |
 | **Executive Presentation** | High-impact, standalone HTML executive slide deck highlighting architecture, metrics, and interview defenses | [`output/presentation.html`](output/presentation.html) |
+| **Interview Defense & Prep Guide** | Comprehensive HTML technical brief covering decision trade-offs, class imbalance, model comparisons & top 10 interview Q&As | [`output/interview_defense_guide.html`](output/interview_defense_guide.html) |
 | **Interactive Dashboard** | Real-time Streamlit dashboard for filtering predictions, inspecting resident histories, and reviewing confusion metrics | [`src/ui/app.py`](src/ui/app.py) |
 
 ---
@@ -124,10 +125,11 @@ streamlit run src/ui/app.py
 ```
 Open [http://localhost:8501](http://localhost:8501) in your browser to inspect resident histories, filter predictions by match criteria (All, Exact 4/4, Partial 3/4, Misses), and explore metric breakdowns.
 
-### Step 4: View Standalone Presentation & Review Table
-Both deliverables are self-contained HTML files requiring zero server infrastructure:
+### Step 4: View Standalone Presentation, Review Table & Interview Defense Guide
+All deliverables are self-contained HTML files requiring zero server infrastructure:
 - **Executive Presentation Deck**: Open `output/presentation.html` in any modern browser.
-- **Interactive Review Table**: Open `output/prediction_review.html` in any modern browser for instant client-side search and filtering.
+- **Interview Defense & Technical Guide**: Open `output/interview_defense_guide.html` for deep decision rationale, model comparisons, and interview Q&As.
+- **Interactive Review Table**: Open `output/prediction_review.html` for instant client-side search and filtering.
 
 ### Step 5: Run Automated Test Suite
 ```bash
@@ -173,6 +175,7 @@ Evaluated on **2,473 strictly chronologically unseen holdout bookings**:
 ├── output/
 │   ├── metrics_summary.json           # Evaluation metrics on unseen holdout set
 │   ├── presentation.html              # Standalone executive slide deck
+│   ├── interview_defense_guide.html   # Comprehensive interview defense & technical guide
 │   ├── prediction_review.html         # Standalone interactive HTML comparison table
 │   ├── prediction_review_table.csv    # Review table matching PDF §3.5 format
 │   └── prediction_review_table.xlsx   # Excel workbook with prediction and metrics sheets
