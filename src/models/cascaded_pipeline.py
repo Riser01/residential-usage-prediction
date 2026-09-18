@@ -5,7 +5,7 @@ Predicts the 4 target variables sequentially:
 1. Facility (Multi-class GBDT)
 2. Usage Day (Multi-class GBDT conditioned on facility context)
 3. Usage Hour (Multi-class GBDT conditioned on facility and day context)
-4. Lead Time / Nudge Timing (Quantile GBDT regressor, alpha=0.35)
+4. Lead Time / Nudge Timing (Quantile GBDT regressor, alpha=0.30)
 """
 
 import os
@@ -127,8 +127,8 @@ class CascadedPredictionPipeline:
         X_stage3["context_day"] = y_day
         self.hour_model.fit(X_stage3, y_hour)
 
-        # Stage 4: Lead Time Quantile Regressor (alpha=0.35)
-        print("Training Stage 4: Lead Time Quantile Regressor (alpha=0.35)...")
+        # Stage 4: Lead Time Quantile Regressor (alpha=0.30)
+        print("Training Stage 4: Lead Time Quantile Regressor (alpha=0.30)...")
         X_stage4 = X_stage3.copy()
         X_stage4["context_hour"] = y_hour
         self.lead_time_model.fit(X_stage4, y_lead)

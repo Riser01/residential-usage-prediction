@@ -56,7 +56,7 @@ Rather than treating the problem as four independent models, the system implemen
                     Facility + Day + Hour Probabilities
                                      v
 +-------------------------------------------------------------------------+
-|  Stage 4: Lead-Time Regressor (Quantile GBDT, alpha=0.35)               |
+|  Stage 4: Lead-Time Regressor (Quantile GBDT, alpha=0.30)               |
 |  Predicts advance booking interval; conservative quantile guarantees   |
 |  notification is delivered prior to habitual reservation action.        |
 +-------------------------------------------------------------------------+
